@@ -88,11 +88,17 @@ class Anim:
         """
         if self.__after__ > 0:
             self.__after__ -= 1
-            return []
-        try:
-            return next(self.__anim_generator__)
-        except StopIteration:
             return [None]
+        try:
+            modifications = next(self.__anim_generator__)
+            # ensure that the returned value is a list
+            if isinstance(modifications, list):
+                return modifications
+            else:
+                return [modifications]
+        except StopIteration:
+            # None is returned once the animation is finished
+            return []
 
     def __compose_with__(self, other):
         """Compose with another animation.
@@ -115,6 +121,10 @@ class Anim:
             not a generator (that is the function once called).
             """
             for s, o in zip_longest(self, other):
+                if not isinstance(s, list):
+                    s = [s]
+                if not isinstance(o, list):
+                    o = [o]
                 yield s + o
         return composed_animation
 
