@@ -93,6 +93,8 @@ class Anim:
             modifications = next(self.__anim_generator__)
             # ensure that the returned value is a list
             if isinstance(modifications, list):
+                if modifications == []:
+                    return [None]
                 return modifications
             else:
                 return [modifications]
