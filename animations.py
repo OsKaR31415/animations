@@ -5,6 +5,7 @@ It only defines a very general *Anim* object.
 
 """
 from typing import Type
+from time import sleep
 from itertools import zip_longest
 import curses
 from frame import *
@@ -82,25 +83,19 @@ class Anim:
         """Gives the next step of the animation.
         Returns:
             list[FrameModification]: The list of modifications to make to the frame.
-        Once every step of the animation is consumed, this yields a list
-        containing only None. This is so that the program can detect if an
-        animation is finished or if it only isn't yielding any modifications.
         """
         if self.__after__ > 0:
             self.__after__ -= 1
-            return [None]
+            return []
         try:
             modifications = next(self.__anim_generator__)
             # ensure that the returned value is a list
             if isinstance(modifications, list):
-                if modifications == []:
-                    return [None]
                 return modifications
             else:
                 return [modifications]
         except StopIteration:
-            # None is returned once the animation is finished
-            return []
+            raise StopIteration
 
     def __compose_with__(self, other):
         """Compose with another animation.
@@ -122,7 +117,7 @@ class Anim:
             This function is a closure because you want to return a function,
             not a generator (that is the function once called).
             """
-            for s, o in zip_longest(self, other):
+            for s, o in zip_longest(self, other, fillvalue=[]):
                 if not isinstance(s, list):
                     s = [s]
                 if not isinstance(o, list):
@@ -161,41 +156,5 @@ class Anim:
         return other >> self
 
 
-def main(scr):
-    fr = "the frame"
-
-    def hello_world(frame):
-        yield ["hello,"]
-        yield ["world!"]
-
-    def sweet_home(frame):
-        while True:
-            yield ["home"]
-            yield ["sweet"]
-
-    def iota(frame):
-        i = 0
-        while True:
-            i += 1
-            yield [str(i)]
-
-    def show_frame(frame):
-        while True:
-            yield [str(frame)]
-
-    HelloWorld = Anim(fr, hello_world, after=2)
-    SweetHome = Anim(fr, sweet_home, after=3)
-    Iota = Anim(fr, iota)
-    ShowFrame = Anim(fr, show_frame, 0)
-
-    anim = Iota >> Iota >> SweetHome << HelloWorld << ShowFrame
-
-    for _ in anim:
-        input(repr(_))
-
-
-if __name__ == "__main__":
-    # curses.wrapper(main)
-    main("foo")
 
 
