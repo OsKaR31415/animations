@@ -1,5 +1,7 @@
 import curses
-from frame import Frame
+from frame import *
+from animations import *
+from primitives import *
 
 
 def initialize_curses_colors():
@@ -18,9 +20,19 @@ def color_test(scr):
 
 def main(scr):
     initialize_curses_colors()
-    color_test(scr)
+    fr = Frame(scr)
+
+    anim = Anim(fr, rainbowed_text(1, 1, "coucou"))
+
+    for modif_list in anim:
+        for modif in modif_list:
+            modif(fr)
+            sleep(0.01)
+            fr.refresh()
+    fr.pause()
 
 
-curses.wrapper(main)
+if __name__ == "__main__":
+    curses.wrapper(main)
 
 
