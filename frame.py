@@ -17,6 +17,10 @@ class Frame:
         else:
             self.scr.addstr(int(y), int(x), str(text), curses.color_pair(col))
 
+    def addstr(self, *args, **kwargs):
+        """The original curses function."""
+        self.scr.addstr(*args, **kwargs)
+
     def refresh(self):
         self.scr.refresh()
 
