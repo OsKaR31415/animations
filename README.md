@@ -25,6 +25,10 @@ This "composition" operator adds an animation **atop** the previous one. So, get
 This is why the `>>` operator can also be called _over_.
 Then, you won't have difficulties understanding what `<<` does : it is the _under_ operator, that adds an animation **under** the previous one.
 
+There is another pair of operators that is used to compose animations in another way : it is used to make two animations play one at a time.
+These operators are `>` and `<`. They are called respectively **then** and **after**.
+Teir names are also very logical : `anim_a > anim_b` plays `anim_a` **then** `anim_b`, while `anim_a < anim_b` plays `anim_a` **after** `anim_b`.
+
 The only thing to notice is that the precedence of these operators is left-to-right. So, for example, in this code : `anim_a >> anim_b >> anim_c << anim_under`, the animation `anim_under` is not only under `anim_c`, but actually under `anim_a >> anim_b >> anim_c`, so it is under all the other animations.
 
 ### Granularity
