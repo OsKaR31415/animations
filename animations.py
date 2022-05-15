@@ -5,10 +5,9 @@ It only defines a very general *Anim* object.
 
 """
 from typing import Type
-from time import sleep
 from itertools import zip_longest
 import curses
-from frame import *
+from frame import FrameModification
 
 class AnimIterator:
     def __init__(self, anim) -> None:
@@ -72,6 +71,9 @@ class Anim:
         """
         self.__anim_generator__ = self.__anim_function__(self.frame)
 
+    def __call__(self, frame):
+        return self.__anim_function__(frame)
+
     def __iter__(self):
         """Returns the iterable version of an animation.
         Returns:
@@ -115,7 +117,7 @@ class Anim:
             If you don't take care of that, using the new generator will change
             the two others each time you call next on the composed generator.
             This function is a closure because you want to return a function,
-            not a generator (that is the function once called).
+            not a generator (a generator is the function once called).
             """
             for s, o in zip_longest(self, other, fillvalue=[]):
                 if not isinstance(s, list):
@@ -129,6 +131,7 @@ class Anim:
         """The >> operator is used to compose two animations.
         That means playing them at the same time.
         *other* will be added atop of *self*.
+        This operator is called "over".
         Args:
             other (Anim): The animation to add over the current one.
         Returns:
@@ -141,13 +144,16 @@ class Anim:
 
     def __lshift__(self, other):
         """The << operator is used to compose two animations.
-        That means playing tem at the same time.
+        That means playing them at the same time.
         *other* well be added behind of *self* (at the very behind if *self* is
         already a composed animation).
+        This operator is called "under".
         Args:
             other (Anim): The animation to add behind the current one.
         Returns:
             Anim: The new animation formed with composing *self* and *other*.
+        Raises:
+            TypeError: If *other* is not an Anim object.
         """
         if not isinstance(other, Anim):
             raise TypeError(
@@ -156,5 +162,54 @@ class Anim:
         return other >> self
 
 
+    def __concatenate_with__(self, other):
+        """Return a new animation generator that is *self* then *other* : both
+        animations are played, but one by one."""
+        def concatenated_animation(frame):
+            """This is a closure.
+            It is used to create a new generator, so the two concatenated
+            generators are stil independant and are not linked with the new one
+            created by concatenation.
+            If you don't take care of that, using the new generator will change
+            the two others each time you call next on the new generator.
+            This function is a closure because you want to return a function,
+            not a generator (a generator is the function once called).
+            """
+            yield from self(frame)
+            yield from other(frame)
+        return concatenated_animation
+
+
+    def __gt__(self, other):
+        """The > operator is used to concatenate two animations.
+        That means playing them one at a time.
+        This operator is called "then", because it plays *self* then *other*.
+        Args:
+            other (Anim): The animation to add after the current one.
+        Returns:
+            Anim: The new animation that is *self* then *other*.
+        Raises:
+            TypeError: If *other* is not an Anim object.
+        """
+        if not isinstance(other, Anim):
+            raise TypeError(f"Cannot concatenate animation with a different type ({type(other)})")
+        return Anim(self.frame, self.__concatenate_with__(other))
+
+    def __lt__(self, other):
+        """The < operator is used to concatenate two animations.
+        That means playing them one at a time.
+        Thie operator is called "after", because it plays *self* after *other*.
+        beware that this is reversed from the order of reading. In fact, it is
+        just like other > self.
+        Args:
+            other (Anim): The animation to add before the current one.
+        Returns:
+            Anim: The new animation that *other* then *self*.
+        Raises:
+            TypeError: If *other* is not an Anim object.
+        """
+        if not isinstance(other, Anim):
+            raise TypeError(f"Cannot concatenate animation with a different type ({type(other)})")
+        return other > self
 
 
