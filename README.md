@@ -24,10 +24,10 @@ You certainly can compose more than two animations with : `anim_a >> anim_b >> a
 This "composition" operator adds an animation **atop** the previous one. So, getting back to the example, the animation `anim_a >> anim_b`, is both animations composed, with `anim_b` **over** `anim_a`.
 This is why the `>>` operator can also be called _over_.
 Then, you won't have difficulties understanding what `<<` does : it is the _under_ operator, that adds an animation **under** the previous one.
+For Unix users, it is easy to remember, because the `>>` is used to append to a file, so it is kind of "adding while keeping the previous thing".
 
-There is another pair of operators that is used to compose animations in another way : it is used to make two animations play one at a time.
-These operators are `>` and `<`. They are called respectively **then** and **after**.
-Teir names are also very logical : `anim_a > anim_b` plays `anim_a` **then** `anim_b`, while `anim_a < anim_b` plays `anim_a` **after** `anim_b`.
+There is another operator that _concatenates_ animations. It is used to play two animations one at a time. It is the `&` operator. It is called the **then** operator, because `anim_a & anim_b` plays `anim_a` **then** `anim_b`.
+For Unix users, it is easy to remember, because the `&` is used to chain two commands, that is running them one by one.
 
 The only thing to notice is that the precedence of these operators is left-to-right. So, for example, in this code : `anim_a >> anim_b >> anim_c << anim_under`, the animation `anim_under` is not only under `anim_c`, but actually under `anim_a >> anim_b >> anim_c`, so it is under all the other animations.
 
