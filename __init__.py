@@ -18,37 +18,29 @@ def initialize_curses_colors():
         curses.init_pair(i, i, -1)
         # curses.init_pair(i + 256, i,)
 
-def color_test(scr):
-    for i in range(255):
-        scr.addstr(str(i), curses.color_pair(i))
-    scr.getch()
-
-
 def screen_saver(fr):
-    # initilize an empty animation
-    anim = Anim(fr, noop)
-    # get the screen bounds
-    max_y, max_x = fr.getmaxyx()
-    for step in range(100):
-        x, y = randint(0, max_x-1), randint(0, max_y-2)
-        anim <<= Anim(fr, fadeinout(y, x, "•"), step)
-    play(fr, anim)
+    dot1 = Anim(fr, fadeinout(10, 10, "•"))
+    dot2 = Anim(fr, fadeinout(10, 11, "•"), after=10)
+    dot3 = Anim(fr, fadeinout(10, 12, "•"), after=20)
+    dots = dot1 >> dot2 >> dot3
+    anim = dots >> Wait(fr, dots, 300)
+    play(fr, dots)
 
 def main(scr):
     initialize_curses_colors()
     fr = Frame(scr)
     screen_saver(fr)
-    return
 
     # fade_in_out = Anim(fr, fadein(5, 5, "coucou")) > Anim(fr, fadeout(5, 5, "coucou"))
 
     coucou = Anim(fr, fadein(5, 5, "coucou")) >> Anim(fr, fadein(6, 5, "c'est moi"))
     hdyd = Anim(fr, fadein(10, 10, "how do you do ?"))
-    anim = coucou > hdyd
+    well = Anim(fr, fadein(20, 5, "je vais well !"))
+    anim = coucou & hdyd & well
 
 
     # anim = Anim(fr, addstr(5, 5, "test", curses.color_pair(1)))
-    play(fr, anim)
+    # play(fr, anim)
 
 
 
