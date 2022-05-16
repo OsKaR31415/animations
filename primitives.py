@@ -11,20 +11,21 @@ from random import randint
 #  ┃ ┃┃┃┃┃┃┗┫┃╺┓
 #  ╹ ╹╹ ╹╹╹ ╹┗━┛
 
-def pause(frame):
+def Pause(frame):
     """pause and wait for a keypress.
     This returns an Anim object, so Wrapping it with the Anim constructor is
     not required, while it is still possible."""
     return Anim(frame, frame.pause())
 
 
-def wait(frame, anim, delay: int =100):
+def Wait(frame, anim, delay: int =100):
     """Wait for *delay* units."""
     for _ in range(int(delay)):
         yield []
-    yield from anim(frame)
+    yield from Anim(frame, anim)(frame)
 
-def noop(frame):
+
+def Noop(frame):
     yield []
 
 
@@ -51,8 +52,12 @@ def text(y: int, x: int, string: str, col: int =None):
                 frame.put_text(int(y), int(x), str(string), int(col))]
     return text_generator
 
+
 def addstr(*args, **kwargs):
-    """Copy of the curses window.addstr function."""
+    """Copy of the curses window.addstr function.
+    It accepts more parameters than the *text* primitive, so you can have more
+    advanced styles, like bold, italics, under line, etc.
+    """
     def addstr_generator(frame):
         yield [lambda frame:
                 frame.addstr(*args, **kwargs)]
@@ -133,9 +138,28 @@ def repeat(anim, times: int =-1):
         function: The animation repeated *times* times.
     """
     def repeat_generator(frame):
-        for _ in range(int(times)):
-            yield from anim(frame)
+        if times < 0:
+            while True:
+                animation = anim(frame)
+                yield from animation
+                del animation
+        else:
+            for _ in range(int(times)):
+                animation = Anim(frame, anim)
+                yield from (animation & animation)(frame)
+                del animation
     return repeat_generator
+
+def Repeat(frame, anim, times: int =-1):
+    """Repeat *times* times the animation *anim*.
+    Args:
+        anim (Anim): The animation to repeat.
+        times (int): The number of repetitions. Default to -1 that means
+                     endless repetitions (as any negative number).
+    Returns:
+        function: The animation repeated *times* times.
+    """
+    return Anim(frame, repeat(anim, times))
 
 
 def slow(anim, factor: int =2):
