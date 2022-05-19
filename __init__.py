@@ -23,8 +23,8 @@ def screen_saver(fr):
     dot2 = Anim(fr, fadeinout(10, 11, "•"), after=10)
     dot3 = Anim(fr, fadeinout(10, 12, "•"), after=20)
     dots = dot1 >> dot2 >> dot3
-    anim = dots >> Wait(fr, dots, 300)
-    play(fr, dots)
+    anim = Wait(fr, dots, 3000)
+    play(fr, Anim(frame, anim))
 
 def main(scr):
     initialize_curses_colors()
