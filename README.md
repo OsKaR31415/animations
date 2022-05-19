@@ -21,7 +21,7 @@ This tool has a particular syntax for _composing_ animations, that is to take tw
 For instance, if `anim_a` and `anim_b` are two animations, then `anim_a >> anim_b` is also an animation that consists  of both animations running at the same time.
 You certainly can compose more than two animations with : `anim_a >> anim_b >> anim_c >> anim_d ...`
 
-This "composition" operator adds an animation **atop** the previous one. So, getting back to the example, the animation `anim_a >> anim_b`, is both animations composed, with `anim_b` **over** `anim_a`.
+This "composition" operator adds an animation **under** the previous one. So, getting back to the example, the animation `anim_a >> anim_b`, is both animations composed, with `anim_b` **over** `anim_a`.
 This is why the `>>` operator can also be called _over_.
 Then, you won't have difficulties understanding what `<<` does : it is the _under_ operator, that adds an animation **under** the previous one.
 For Unix users, it is easy to remember, because the `>>` is used to append to a file, so it is kind of "adding while keeping the previous thing".
@@ -42,7 +42,7 @@ But the user is also allowed to create animations from scratch. That allows to c
 One important part of the design goals is that creating animation has to be done without worrying about any details.
 No one likes when doing a simple thing requires thinking about tons of details that are useless to the real problem you want to solve.
 So this tool tries to allow the creation of animations without worrying about useless details, even when you work on complex animations.
-The synax with the operators `>>` and `<<` helps that purpose : you don't need to care yourself about how to put certain animations atop or under other ones.
+The synax with the operators `>>` and `<<` helps that purpose : you don't need to care yourself about how to put certain animations over or under other ones.
 You don't even need to how composing animations work !
 To start creating animations, you just need to know some basic frame modifiers (functions that draw on the screen), and to know that an animation is made out of a function that yields frame modifiers.
 You don't even need to know that, you could already make a lot of animations just using the primitives (so really, only understanding the _over_ and _under_ operators is required).
