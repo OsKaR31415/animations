@@ -11,6 +11,7 @@ from random import randint
 #  ┃ ┃┃┃┃┃┃┗┫┃╺┓
 #  ╹ ╹╹ ╹╹╹ ╹┗━┛
 
+# FIXME
 def Pause(frame):
     """pause and wait for a keypress.
     This returns an Anim object, so Wrapping it with the Anim constructor is
@@ -18,6 +19,7 @@ def Pause(frame):
     return Anim(frame, frame.pause())
 
 
+# FIXME: add a closure
 def Wait(frame, anim, delay: int =100):
     """Wait for *delay* units."""
     for _ in range(int(delay)):
@@ -25,6 +27,7 @@ def Wait(frame, anim, delay: int =100):
     yield from anim(frame)
 
 
+# FIXME
 def Noop(frame):
     yield []
 
@@ -33,6 +36,13 @@ def Noop(frame):
 # ┣┻┓┣━┫┗━┓┃┃      ┃ ┣╸ ┏╋┛ ┃
 # ┗━┛╹ ╹┗━┛╹┗━╸    ╹ ┗━╸╹ ╹ ╹
 # animations that simply show text, with some style
+
+
+def clear():
+    def clear_generator(frame):
+        yield [lambda frame: frame.clear()]
+    return clear_generator
+
 
 def text(y: int, x: int, string: str, col: int =None):
     """Add the given *string* text at the given x, y coordinates, with the
