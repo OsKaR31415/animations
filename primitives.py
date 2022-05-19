@@ -22,7 +22,7 @@ def Wait(frame, anim, delay: int =100):
     """Wait for *delay* units."""
     for _ in range(int(delay)):
         yield []
-    yield from Anim(frame, anim)(frame)
+    yield from anim(frame)
 
 
 def Noop(frame):
