@@ -33,8 +33,13 @@ class Anim:
             ValueError: If *after* is not positive
         Example:
             Note that Anim can be used to copy an animation.
+            >>> frame = "foo"
+            >>> foo_anim_function = lambda frame: "foo"
             >>> my_anim = Anim(frame, foo_anim_function)  # here we have one animation
             >>> my_anim_copy = Anim(frame, my_anim)  # this is the copy
+            >>> my_anim is my_anim_copy
+            False
+            >>> my_anim.__anim_function__ is my_anim_copy.__anim_function__
             >>> # both share the same animation function, but not the same
             >>> # generator, so they really are independant.
         """
@@ -168,7 +173,7 @@ class Anim:
         def concatenated_animation(frame):
             """This is a closure.
             It is used to create a new generator, so the two concatenated
-            generators are stil independant and are not linked with the new one
+            generators are stil independent and are not linked with the new one
             created by concatenation.
             If you don't take care of that, using the new generator will change
             the two others each time you call next on the new generator.
@@ -177,7 +182,8 @@ class Anim:
             """
             self_generator = self(frame)
             other_generator = other(frame)
-            yield from chain(self_generator, other_generator)
+            yield from self_generator
+            yield from other_generator
         return concatenated_animation
 
 
@@ -191,8 +197,7 @@ class Anim:
         Returns:
             Anim: The new animation that is *self* then *other*.
         """
-        if not isinstance(other, Anim):
-            other = Anim(self.frame, other)
+        other = Anim(self.frame, other)
         return Anim(self.frame, self.__concatenate_with__(other))
 
 
