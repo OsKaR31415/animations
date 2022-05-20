@@ -38,6 +38,9 @@ class Frame:
         self.scr.getkey()
 
 
+    def copy(self):
+        return Frame(self.scr)
+
 
 def main(stdscr):
     frame = Frame(stdscr)
