@@ -5,7 +5,7 @@ It only defines a very general *Anim* object.
 
 """
 from typing import Type
-from itertools import zip_longest, chain
+from itertools import zip_longest, chain, tee
 import curses
 from frame import FrameModification
 
@@ -55,10 +55,12 @@ class Anim:
             # generator.
             # This means that you may use Anim to actually copy an animation.
             self.__anim_function__ = animation.__anim_function__
+            animation.__anim_generator__, self.__anim_generator__ = tee(animation.__anim_generator__)
         else:
             self.__anim_function__ = animation
+            self.__anim_generator__ = tee(animation(self.frame))[0]
         # create the animation generator (animation function once called)
-        self.reset_animation()
+        # self.reset_animation()
         # the delay before the animation starts
         if not isinstance(after, int):
             raise TypeError(
@@ -67,21 +69,21 @@ class Anim:
             raise ValueError("The *after* parameter must be positive")
         self.__after__ = int(after)
 
-    def reset_animation(self) -> None:
-        """Reset the animation. This restart the animation and removes any
-        delay that it could have before starting.
-        This can used both to initialize the object, in *Anim.__init__*, and to
-        reset an animation, since it creates/overrides the
-        *Anim.__anim_generator__* attribute.
-        """
-        self.__anim_generator__ = self.__anim_function__(self.frame)
+    # def reset_animation(self) -> None:
+    #     """Reset the animation. This restart the animation and removes any
+    #     delay that it could have before starting.
+    #     This can used both to initialize the object, in *Anim.__init__*, and to
+    #     reset an animation, since it creates/overrides the
+    #     *Anim.__anim_generator__* attribute.
+    #     """
+    #     self.__anim_generator__ = self.__anim_function__(self.frame)
 
     def __call__(self, frame):
         """Calling the Anim object is the same as calling its animation function.
         The definition speaks by itself :
         return self.__anim_function__(frame)
         """
-        return self.__anim_function__(frame)
+        return tee(self.__anim_function__(frame))
 
     def __iter__(self):
         """Returns the iterable version of an animation.
@@ -182,8 +184,16 @@ class Anim:
             """
             self_generator = self(frame)
             other_generator = other(frame)
-            yield from self_generator
-            yield from other_generator
+            i = 0
+            for self_item in self_generator:
+                yield self_item
+                i += 1
+            assert i > 0
+            i = 0
+            for other_item in other_generator:
+                yield otherf_item
+                i += 1
+            assert i > 0
         return concatenated_animation
 
 
