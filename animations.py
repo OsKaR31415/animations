@@ -191,7 +191,7 @@ class Anim:
             assert i > 0
             i = 0
             for other_item in other_generator:
-                yield otherf_item
+                yield other_item
                 i += 1
             assert i > 0
         return concatenated_animation
